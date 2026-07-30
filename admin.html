@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced M3U Editor Studio</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f6ff',
+                            100: '#e0edff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        },
+                        dark: {
+                            bg: '#0b0f17',
+                            card: '#111827',
+                            border: '#1f2937',
+                            hover: '#1f2937'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- QRCode.js Library for QR Code Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f17;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        #qrcode img {
+            margin: 0 auto;
+            border-radius: 8px;
+            padding: 8px;
+            background: #ffffff;
+        }
+    </style>
+</head>
+<body class="bg-dark-bg text-slate-200 antialiased font-sans min-h-screen flex flex-col">
+
+    <!-- APP HEADER / NAVBAR -->
+    <header class="sticky top-0 z-30 glass-panel border-b border-gray-800/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo & Title -->
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-brand-600/20 text-brand-500 rounded-xl border border-brand-500/30">
+                        <i data-lucide="tv" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+                            M3U Studio <span class="text-xs px-2 py-0.5 rounded bg-brand-500/20 text-brand-400 font-medium ml-1">PRO</span>
+                        </h1>
+                        <p class="text-xs text-slate-400 hidden sm:block">Advanced IPTV Playlist Editor & GitHub Sync</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center space-x-1">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                    </button>
+                    <button onclick="switchTab('editor')" id="nav-editor" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+                        <i data-lucide="list-video" class="w-4 h-4"></i> Editor
+                    </button>
+                    <button onclick="switchTab('generator')" id="nav-generator" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+                        <i data-lucide="file-output" class="w-4 h-4"></i> Generator
+                    </button>
+                    <button onclick="switchTab('github')" id="nav-github" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+                        <i data-lucide="github" class="w-4 h-4"></i> GitHub Sync
+                    </button>
+                </nav>
+
+                <!-- Quick Action Header Controls -->
+                <div class="flex items-center gap-2">
+                    <button onclick="openModal('backupModal')" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition" title="Backup & Restore">
+                        <i data-lucide="hard-drive-upload" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="clearCurrentSession()" class="p-2 text-rose-400 hover:text-rose-300 rounded-lg hover:bg-rose-500/10 transition" title="Clear Session">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-gray-800 bg-dark-card px-4 pt-2 pb-4 space-y-1">
+            <button onclick="switchTab('dashboard'); toggleMobileMenu()" class="w-full px-3 py-2 rounded-lg text-left text-sm font-medium flex items-center gap-2 text-slate-300 hover:bg-slate-800">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+            </button>
+            <button onclick="switchTab('editor'); toggleMobileMenu()" class="w-full px-3 py-2 rounded-lg text-left text-sm font-medium flex items-center gap-2 text-slate-300 hover:bg-slate-800">
+                <i data-lucide="list-video" class="w-4 h-4"></i> Editor
+            </button>
+            <button onclick="switchTab('generator'); toggleMobileMenu()" class="w-full px-3 py-2 rounded-lg text-left text-sm font-medium flex items-center gap-2 text-slate-300 hover:bg-slate-800">
+                <i data-lucide="file-output" class="w-4 h-4"></i> Generator
+            </button>
+            <button onclick="switchTab('github'); toggleMobileMenu()" class="w-full px-3 py-2 rounded-lg text-left text-sm font-medium flex items-center gap-2 text-slate-300 hover:bg-slate-800">
+                <i data-lucide="github" class="w-4 h-4"></i> GitHub Sync
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN APP CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- ==================== DASHBOARD VIEW ==================== -->
+        <section id="tab-dashboard" class="tab-content space-y-6">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- File / URL Upload Box -->
+                <div class="lg:col-span-2 bg-dark-card border border-gray-800 rounded-2xl p-6 relative overflow-hidden">
+                    <div class="absolute -right-10 -bottom-10 opacity-5 pointer-events-none">
+                        <i data-lucide="file-text" class="w-64 h-64"></i>
+                    </div>
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-white">
+                        <i data-lucide="import" class="w-5 h-5 text-brand-500"></i> Import M3U Playlist
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="border-2 border-dashed border-gray-700 hover:border-brand-500 rounded-xl p-5 text-center cursor-pointer transition bg-slate-900/40 hover:bg-slate-900/80 flex flex-col items-center justify-center min-h-[140px]" onclick="document.getElementById('m3uFileInput').click()">
+                            <i data-lucide="upload-cloud" class="w-8 h-8 text-brand-500 mb-2"></i>
+                            <span class="text-sm font-medium text-slate-200">Upload M3U / M3U8 File</span>
+                            <span class="text-xs text-slate-500 mt-1">Drag and drop or click to browse</span>
+                            <input type="file" id="m3uFileInput" accept=".m3u,.m3u8" class="hidden" onchange="handleFileUpload(event)">
+                        </div>
+
+                        <div class="flex flex-col justify-between bg-slate-900/40 border border-gray-800 rounded-xl p-5">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-2">Fetch from Web URL</label>
+                                <input type="url" id="m3uUrlInput" placeholder="https://example.com/playlist.m3u" class="w-full bg-dark-bg border border-gray-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                            </div>
+                            <button onclick="fetchM3uFromUrl()" class="mt-3 w-full bg-brand-600 hover:bg-brand-500 text-white font-medium py-2 px-4 rounded-lg text-sm transition flex items-center justify-center gap-2">
+                                <i data-lucide="download" class="w-4 h-4"></i> Load Playlist
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GitHub Sync Quick Status -->
+                <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                                <i data-lucide="github" class="w-5 h-5 text-slate-300"></i> Sync Overview
+                            </h3>
+                            <span id="stat-sync-badge" class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                Unsynced
+                            </span>
+                        </div>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between border-b border-gray-800/80 pb-2">
+                                <span class="text-slate-400">Repo:</span>
+                                <span id="dash-repo-name" class="font-mono text-slate-200">GoM3U/GoM3U-URL</span>
+                            </div>
+                            <div class="flex justify-between border-b border-gray-800/80 pb-2">
+                                <span class="text-slate-400">File Path:</span>
+                                <span id="dash-file-path" class="font-mono text-slate-200">bd.m3u</span>
+                            </div>
+                            <div class="flex justify-between pb-2">
+                                <span class="text-slate-400">Last Sync:</span>
+                                <span id="dash-last-sync" class="text-slate-200">Never</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="switchTab('github')" class="w-full mt-4 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-2 px-4 rounded-lg text-sm transition border border-gray-700 flex items-center justify-center gap-2">
+                        <i data-lucide="settings" class="w-4 h-4"></i> Manage Sync
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistics Counters Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div class="bg-dark-card border border-gray-800 rounded-xl p-4 flex items-center gap-4">
+                    <div class="p-3 bg-brand-500/10 text-brand-500 rounded-xl">
+                        <i data-lucide="list" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400">Total Channels</p>
+                        <h4 id="stat-total" class="text-2xl font-bold text-white">0</h4>
+                    </div>
+                </div>
+
+                <div class="bg-dark-card border border-gray-800 rounded-xl p-4 flex items-center gap-4">
+                    <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl">
+                        <i data-lucide="check-circle" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400">Active</p>
+                        <h4 id="stat-active" class="text-2xl font-bold text-white">0</h4>
+                    </div>
+                </div>
+
+                <div class="bg-dark-card border border-gray-800 rounded-xl p-4 flex items-center gap-4">
+                    <div class="p-3 bg-rose-500/10 text-rose-400 rounded-xl">
+                        <i data-lucide="x-circle" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400">Disabled</p>
+                        <h4 id="stat-disabled" class="text-2xl font-bold text-white">0</h4>
+                    </div>
+                </div>
+
+                <div class="bg-dark-card border border-gray-800 rounded-xl p-4 flex items-center gap-4">
+                    <div class="p-3 bg-purple-500/10 text-purple-400 rounded-xl">
+                        <i data-lucide="folder" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400">Categories</p>
+                        <h4 id="stat-groups" class="text-2xl font-bold text-white">0</h4>
+                    </div>
+                </div>
+
+                <div class="bg-dark-card border border-gray-800 rounded-xl p-4 flex items-center gap-4 col-span-2 md:col-span-1">
+                    <div class="p-3 bg-amber-500/10 text-amber-400 rounded-xl">
+                        <i data-lucide="layers" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400">Playlists Saved</p>
+                        <h4 id="stat-playlists" class="text-2xl font-bold text-white">0</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Playlists Management Section -->
+            <div class="bg-dark-card border border-gray-800 rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Saved Playlists</h3>
+                        <p class="text-xs text-slate-400">Locally cached session collections and exported presets</p>
+                    </div>
+                    <button onclick="createNewPlaylistPrompt()" class="bg-brand-600 hover:bg-brand-500 text-white font-medium px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5">
+                        <i data-lucide="plus" class="w-4 h-4"></i> New Playlist
+                    </button>
+                </div>
+
+                <div id="playlistCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+
+        </section>
+
+        <!-- ==================== CHANNEL EDITOR VIEW ==================== -->
+        <section id="tab-editor" class="tab-content hidden space-y-4">
+            
+            <div class="bg-dark-card border border-gray-800 rounded-xl p-4 space-y-4">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    
+                    <div class="flex flex-wrap items-center gap-2 flex-1">
+                        <div class="relative flex-1 min-w-[200px]">
+                            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
+                            <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Search channels, TVG IDs..." class="w-full bg-dark-bg border border-gray-700 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                        </div>
+
+                        <select id="groupFilter" onchange="applyFilters()" class="bg-dark-bg border border-gray-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500 min-w-[150px]">
+                            <option value="">All Groups</option>
+                        </select>
+
+                        <select id="statusFilter" onchange="applyFilters()" class="bg-dark-bg border border-gray-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                            <option value="all">All Status</option>
+                            <option value="active">Active Only</option>
+                            <option value="disabled">Disabled Only</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button onclick="openModal('addChannelModal')" class="bg-brand-600 hover:bg-brand-500 text-white font-medium px-3 py-2 rounded-lg text-sm transition flex items-center gap-1.5">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Add Channel
+                        </button>
+
+                        <div class="h-6 w-px bg-gray-800 mx-1"></div>
+
+                        <button onclick="bulkChangeGroup()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-3 py-2 rounded-lg text-sm transition border border-gray-700 flex items-center gap-1.5" title="Change group for selected">
+                            <i data-lucide="folder-input" class="w-4 h-4"></i> Group
+                        </button>
+                        <button onclick="bulkReplaceLogo()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-3 py-2 rounded-lg text-sm transition border border-gray-700 flex items-center gap-1.5" title="Replace logo for selected">
+                            <i data-lucide="image" class="w-4 h-4"></i> Logo
+                        </button>
+                        <button onclick="bulkDelete()" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-medium px-3 py-2 rounded-lg text-sm transition border border-rose-500/20 flex items-center gap-1.5">
+                            <i data-lucide="trash" class="w-4 h-4"></i> Delete Selected
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between text-xs text-slate-400 px-1 pt-2 border-t border-gray-800">
+                    <div class="flex items-center gap-3">
+                        <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+                            <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this.checked)" class="rounded bg-dark-bg border-gray-700 text-brand-600 focus:ring-0 w-4 h-4">
+                            <span>Select All Shown</span>
+                        </label>
+                        <span id="selectedCountText">(0 selected)</span>
+                    </div>
+                    <div>
+                        Showing <span id="visibleChannelsCount" class="font-bold text-white">0</span> channels
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-dark-card border border-gray-800 rounded-xl overflow-hidden shadow-xl">
+                <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead class="sticky top-0 bg-slate-900/90 backdrop-blur border-b border-gray-800 text-xs font-semibold text-slate-400 uppercase tracking-wider z-10">
+                            <tr>
+                                <th class="py-3 px-4 w-10 text-center">#</th>
+                                <th class="py-3 px-4 w-12 text-center">Select</th>
+                                <th class="py-3 px-4 w-16">Logo</th>
+                                <th class="py-3 px-4">Channel Name</th>
+                                <th class="py-3 px-4">Group Title</th>
+                                <th class="py-3 px-4">TVG ID</th>
+                                <th class="py-3 px-4">Stream URL</th>
+                                <th class="py-3 px-4 w-24 text-center">Status</th>
+                                <th class="py-3 px-4 w-32 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="channelsTableBody" class="divide-y divide-gray-800/60 font-mono text-xs"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== GENERATOR VIEW ==================== -->
+        <section id="tab-generator" class="tab-content hidden space-y-6">
+            <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-800">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i data-lucide="code" class="w-5 h-5 text-brand-500"></i> Playlist Generator Output
+                        </h2>
+                        <p class="text-xs text-slate-400">Valid #EXTM3U formatting ready to export or upload</p>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button onclick="generateM3uOutput()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium px-3 py-2 rounded-lg text-sm transition border border-gray-700 flex items-center gap-1.5">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Refresh
+                        </button>
+                        <button onclick="copyGeneratedM3u()" class="bg-brand-600 hover:bg-brand-500 text-white font-medium px-3 py-2 rounded-lg text-sm transition flex items-center gap-1.5">
+                            <i data-lucide="copy" class="w-4 h-4"></i> Copy Text
+                        </button>
+                        <button onclick="downloadM3uFile()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-3 py-2 rounded-lg text-sm transition flex items-center gap-1.5">
+                            <i data-lucide="download" class="w-4 h-4"></i> Download .m3u
+                        </button>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <textarea id="m3uOutputTextarea" readonly class="w-full h-96 bg-dark-bg border border-gray-800 rounded-xl p-4 font-mono text-xs text-emerald-400 focus:outline-none focus:border-brand-500/50 leading-relaxed resize-y"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== GITHUB SYNC VIEW ==================== -->
+        <section id="tab-github" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- GitHub Settings Form -->
+                <div class="lg:col-span-2 bg-dark-card border border-gray-800 rounded-2xl p-6 space-y-4">
+                    <div class="flex items-center gap-3 pb-4 border-b border-gray-800">
+                        <div class="p-2 bg-slate-800 rounded-xl text-white">
+                            <i data-lucide="github" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-white">GitHub Synchronization Panel</h2>
+                            <p class="text-xs text-slate-400">Push your edited M3U playlist directly to a GitHub Repository</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">GitHub Username</label>
+                            <input type="text" id="ghUsername" oninput="updateGithubPreview()" placeholder="e.g. GoM3U" class="w-full bg-dark-bg border border-gray-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Repository Name</label>
+                            <input type="text" id="ghRepo" oninput="updateGithubPreview()" placeholder="e.g. GoM3U-URL" class="w-full bg-dark-bg border border-gray-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Branch Name</label>
+                            <input type="text" id="ghBranch" oninput="updateGithubPreview()" value="main" class="w-full bg-dark-bg border border-gray-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Target File Name / Path</label>
+                            <input type="text" id="ghPath" oninput="updateGithubPreview()" value="bd.m3u" placeholder="e.g. bd.m3u" class="w-full bg-dark-bg border border-gray-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-slate-300 mb-1">
+                                Personal Access Token (PAT) 
+                                <span class="text-slate-500 text-[10px] ml-1">(Requires 'repo' scope access)</span>
+                            </label>
+                            <input type="password" id="ghToken" onchange="readGithubInputs()" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="w-full bg-dark-bg border border-gray-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500 font-mono">
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Commit Message</label>
+                            <input type="text" id="ghCommitMsg" value="Update IPTV channels playlist via M3U Studio" class="w-full bg-dark-bg border border-gray-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex flex-wrap items-center gap-3">
+                        <button onclick="testGitHubConnection()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium px-4 py-2 rounded-lg text-sm transition border border-gray-700 flex items-center gap-2">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i> Test Connection
+                        </button>
+                        <button onclick="syncToGitHub()" class="bg-brand-600 hover:bg-brand-500 text-white font-medium px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
+                            <i data-lucide="upload" class="w-4 h-4"></i> Commit & Sync To GitHub
+                        </button>
+                    </div>
+                </div>
+
+                <!-- GitHub Custom Domain Live Preview Box -->
+                <div class="space-y-6">
+                    <!-- ==================== GOM3U CUSTOM DOMAIN LIVE PREVIEW ==================== -->
+                    <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-gray-800">
+                            <div>
+                                <h3 class="text-md font-bold text-white flex items-center gap-2">
+                                    <i data-lucide="globe-2" class="w-5 h-5 text-brand-500"></i> GoM3U Custom Domain Endpoint
+                                </h3>
+                                <p class="text-xs text-slate-400">Automated Live Endpoint for GoM3U-URL Custom Domain</p>
+                            </div>
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                Active Custom Domain
+                            </span>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">
+                                Custom Domain Base URL
+                            </label>
+                            <input type="url" id="gom3uCustomDomainInput" oninput="updateGom3uPreview()" value="https://gom3u.site.je" class="w-full bg-dark-bg border border-gray-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500 font-mono">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block text-xs font-medium text-slate-400">Target Live URL Preview:</label>
+                            <div class="bg-dark-bg border border-gray-800 rounded-xl p-3 font-mono text-xs text-emerald-400 break-all" id="gom3uCustomUrlPreview">
+                                https://gom3u.site.je/bd.m3u
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-2">
+                            <button onclick="copyGom3uLinkPreview()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium py-2 rounded-lg text-xs transition border border-gray-700 flex items-center justify-center gap-1.5">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Custom Domain URL
+                            </button>
+                            <button onclick="openGom3uLinkPreview()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium p-2 rounded-lg text-xs transition border border-gray-700 flex items-center justify-center" title="Open Link">
+                                <i data-lucide="external-link" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Hidden legacy previews maintained for state preservation -->
+                    <div class="hidden" id="rawGistPreview">https://raw.githubusercontent.com/GoM3U/GoM3U-URL/main/bd.m3u</div>
+                    <div class="hidden" id="pagesUrlPreview">https://gom3u.site.je/bd.m3u</div>
+                    <input type="hidden" id="ghPagesCustomBase" value="https://gom3u.site.je/">
+                </div>
+
+            </div>
+
+            <!-- ==================== GOM3U CUSTOM DOMAIN LIVE PLAYLIST CARDS & HISTORY ==================== -->
+            <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-gray-800">
+                    <div>
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i data-lucide="sparkles" class="w-5 h-5 text-emerald-400"></i> GoM3U Live Custom Domain Playlist Cards
+                        </h3>
+                        <p class="text-xs text-slate-400">Endpoints generated automatically using https://gom3u.site.je</p>
+                    </div>
+                    <button onclick="clearGom3uUrlHistory()" class="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 transition">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Clear Custom Domain History
+                    </button>
+                </div>
+
+                <div id="gom3uCustomUrlHistoryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+
+            <!-- GENERATED GITHUB PLAYLIST URL CARDS & HISTORY (Legacy / Backup) -->
+            <div class="bg-dark-card border border-gray-800 rounded-2xl p-6 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-gray-800">
+                    <div>
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i data-lucide="globe" class="w-5 h-5 text-slate-400"></i> Raw / Backup Sync History
+                        </h3>
+                        <p class="text-xs text-slate-400">Synced playlist raw history entries</p>
+                    </div>
+                    <button onclick="clearUrlHistory()" class="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 transition">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Clear Raw History
+                    </button>
+                </div>
+
+                <div id="githubUrlHistoryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+
+            <div class="hidden" id="githubPagesUrlHistoryGrid"></div>
+        </section>
+
+    </main>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- Add/Edit Channel Modal -->
+    <div id="channelModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-dark-card border border-gray-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl space-y-4 p-6">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                <h3 id="channelModalTitle" class="text-lg font-bold text-white">Add New Channel</h3>
+                <button onclick="closeModal('channelModal')" class="text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="channelForm" onsubmit="handleSaveChannel(event)" class="space-y-4">
+                <input type="hidden" id="editChannelId">
+                
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Channel Name *</label>
+                    <input type="text" id="modalChannelName" required class="w-full bg-dark-bg border border-gray-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Group Title</label>
+                        <input type="text" id="modalChannelGroup" placeholder="e.g. Sports" class="w-full bg-dark-bg border border-gray-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">TVG ID</label>
+                        <input type="text" id="modalChannelTvgId" placeholder="e.g. Sports1.us" class="w-full bg-dark-bg border border-gray-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Logo URL</label>
+                    <input type="url" id="modalChannelLogo" placeholder="https://..." class="w-full bg-dark-bg border border-gray-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Stream URL *</label>
+                    <input type="url" id="modalChannelStream" required placeholder="https://..." class="w-full bg-dark-bg border border-gray-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500 font-mono text-xs">
+                </div>
+
+                <div class="flex items-center gap-2 pt-2">
+                    <input type="checkbox" id="modalChannelEnabled" class="rounded bg-dark-bg border-gray-700 text-brand-600 focus:ring-0 w-4 h-4">
+                    <label for="modalChannelEnabled" class="text-sm font-medium text-slate-300">Channel Active / Enabled</label>
+                </div>
+
+                <div class="pt-4 border-t border-gray-800 flex justify-end gap-3">
+                    <button type="button" onclick="closeModal('channelModal')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium">Cancel</button>
+                    <button type="submit" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium">Save Channel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div id="qrModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-dark-card border border-gray-800 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl p-6 text-center space-y-4">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i data-lucide="qr-code" class="w-5 h-5 text-brand-500"></i> Playlist QR Code
+                </h3>
+                <button onclick="closeModal('qrModal')" class="text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-slate-400">Scan with your mobile or IPTV app camera to instantly import the playlist URL.</p>
+
+            <div id="qrcode" class="py-2 flex justify-center"></div>
+
+            <p id="qrUrlText" class="text-[11px] font-mono text-brand-400 break-all bg-dark-bg p-2 rounded-lg border border-gray-800"></p>
+
+            <button onclick="closeModal('qrModal')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 rounded-lg text-sm font-medium">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- Backup / Restore Modal -->
+    <div id="backupModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-dark-card border border-gray-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i data-lucide="database" class="w-5 h-5 text-brand-500"></i> Backup & Restore Data
+                </h3>
+                <button onclick="closeModal('backupModal')" class="text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-slate-400">Export all your current playlist data, generated URLs history, and GitHub settings into a JSON backup file.</p>
+
+            <div class="space-y-3 pt-2">
+                <button onclick="exportBackupJson()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-2.5 px-4 rounded-xl text-sm transition border border-gray-700 flex items-center justify-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4"></i> Export Backup (.JSON)
+                </button>
+
+                <div class="relative">
+                    <button onclick="document.getElementById('importBackupInput').click()" class="w-full bg-brand-600/20 hover:bg-brand-600/30 text-brand-400 font-medium py-2.5 px-4 rounded-xl text-sm transition border border-brand-500/30 flex items-center justify-center gap-2">
+                        <i data-lucide="upload" class="w-4 h-4"></i> Restore From Backup File
+                    </button>
+                    <input type="file" id="importBackupInput" accept=".json" class="hidden" onchange="importBackupJson(event)">
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-gray-800 flex justify-end">
+                <button onclick="closeModal('backupModal')" class="bg-slate-800 text-slate-300 px-4 py-2 rounded-lg text-sm">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex flex-col items-center justify-center space-y-3">
+        <div class="w-12 h-12 border-4 border-brand-500/30 border-t-brand-500 rounded-full animate-spin"></div>
+        <p id="loadingText" class="text-sm font-medium text-slate-200">Processing playlist data...</p>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+    <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+    <script>
+        /* ==================== APP STATE ==================== */
+        let state = {
+            channels: [],
+            selectedChannelIds: new Set(),
+            playlists: [],
+            urlHistory: [],
+            pagesUrlHistory: [],
+            gom3uUrlHistory: [],
+            currentPlaylistId: null,
+            github: {
+                username: 'GoM3U',
+                repo: 'GoM3U-URL',
+                branch: 'main',
+                path: 'bd.m3u',
+                token: '',
+                lastSync: null,
+                pagesCustomBase: 'https://gom3u.site.je'
+            }
+        };
+
+        /* ==================== INITIALIZATION ==================== */
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            loadLocalStorage();
+            updateDashboardStats();
+            renderChannelsTable();
+            renderPlaylistCards();
+            populateGithubFields();
+            populateGithubPagesFields();
+            renderUrlHistory();
+            renderPagesUrlHistory();
+            renderGom3uUrlHistory();
+        });
+
+        /* ==================== NAVIGATION / TABS ==================== */
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-slate-800', 'text-white'));
+
+            const targetTab = document.getElementById(`tab-${tabName}`);
+            const targetNav = document.getElementById(`nav-${tabName}`);
+
+            if (targetTab) targetTab.classList.remove('hidden');
+            if (targetNav) targetNav.classList.add('bg-slate-800', 'text-white');
+
+            if (tabName === 'generator') generateM3uOutput();
+            if (tabName === 'github') {
+                updateGithubPreview();
+                updateGithubPagesPreview();
+                updateGom3uPreview();
+            }
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        /* ==================== LOCALSTORAGE SAVE / RESTORE ==================== */
+        function saveLocalStorage() {
+            try {
+                localStorage.setItem('m3u_studio_data', JSON.stringify({
+                    channels: state.channels,
+                    playlists: state.playlists,
+                    urlHistory: state.urlHistory,
+                    pagesUrlHistory: state.pagesUrlHistory,
+                    gom3uUrlHistory: state.gom3uUrlHistory,
+                    github: state.github
+                }));
+            } catch (e) {
+                showToast('Failed to save state to LocalStorage', 'error');
+            }
+        }
+
+        function loadLocalStorage() {
+            const saved = localStorage.getItem('m3u_studio_data');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    state.channels = parsed.channels || [];
+                    state.playlists = parsed.playlists || [];
+                    state.urlHistory = parsed.urlHistory || [];
+                    state.pagesUrlHistory = parsed.pagesUrlHistory || [];
+                    state.gom3uUrlHistory = parsed.gom3uUrlHistory || [];
+                    state.github = parsed.github || state.github;
+                    if (!state.github.repo || state.github.repo === 'IPTV') {
+                        state.github.repo = 'GoM3U-URL';
+                    }
+                    if (!state.github.pagesCustomBase) {
+                        state.github.pagesCustomBase = 'https://gom3u.site.je';
+                    }
+                } catch (e) {
+                    console.error('Failed parsing saved localstorage data');
+                }
+            } else {
+                loadDemoData();
+            }
+        }
+
+        function loadDemoData() {
+            state.channels = [
+                { id: '1', name: 'HBO HD US', group: 'Movies', tvgId: 'HBO.us', logo: 'https://via.placeholder.com/40', stream: 'https://example.com/stream1.m3u8', enabled: true },
+                { id: '2', name: 'ESPN Sports', group: 'Sports', tvgId: 'ESPN.us', logo: 'https://via.placeholder.com/40', stream: 'https://example.com/stream2.m3u8', enabled: true },
+                { id: '3', name: 'BBC News UK', group: 'News', tvgId: 'BBCNews.uk', logo: 'https://via.placeholder.com/40', stream: 'https://example.com/stream3.m3u8', enabled: false },
+            ];
+            state.playlists = [
+                { id: 'default', name: 'Main IPTV Playlist', totalChannels: 3, lastUpdate: new Date().toLocaleDateString() }
+            ];
+            saveLocalStorage();
+        }
+
+        function clearCurrentSession() {
+            if (confirm('Are you sure you want to clear all current channels and playlists?')) {
+                state.channels = [];
+                state.selectedChannelIds.clear();
+                saveLocalStorage();
+                updateDashboardStats();
+                renderChannelsTable();
+                renderPlaylistCards();
+                showToast('Session cleared successfully', 'info');
+            }
+        }
+
+        /* ==================== AUTOMATIC FILENAME FORMATTER ==================== */
+        function formatSafeFilename(inputName) {
+            if (!inputName) return 'playlist.m3u';
+            let formatted = inputName.trim().replace(/\s+/g, '-').replace(/[^a-zA-Z0-9_\-\./]/g, '');
+            if (!formatted.toLowerCase().endsWith('.m3u') && !formatted.toLowerCase().endsWith('.m3u8')) {
+                formatted += '.m3u';
+            }
+            return formatted;
+        }
+
+        function buildGitHubRawUrl(username, repo, branch, filepath) {
+            const safeUser = (username || 'username').trim();
+            const safeRepo = (repo || 'repository').trim();
+            const safeBranch = (branch || 'main').trim();
+            const safeFile = formatSafeFilename(filepath);
+            return `https://raw.githubusercontent.com/${safeUser}/${safeRepo}/${safeBranch}/${safeFile}`;
+        }
+
+        function buildGitHubPagesUrl(username, repo, filepath, customBaseUrl) {
+            const safeFile = formatSafeFilename(filepath);
+            let base = (customBaseUrl || '').trim();
+
+            if (base) {
+                if (!base.endsWith('/')) base += '/';
+                return base + safeFile;
+            }
+
+            const safeUser = (username || 'username').trim();
+            const safeRepo = (repo || 'repository').trim();
+            return `https://${safeUser}.github.io/${safeRepo}/${safeFile}`;
+        }
+
+        function buildGom3uCustomUrl(filepath, customBaseDomain) {
+            const safeFile = formatSafeFilename(filepath);
+            let base = (customBaseDomain || 'https://gom3u.site.je').trim();
+            if (!base.endsWith('/')) base += '/';
+            return base + safeFile;
+        }
+
+        /* ==================== M3U PARSER ==================== */
+        function parseM3U(m3uText) {
+            const lines = m3uText.split(/\r?\n/);
+            const parsedChannels = [];
+            let currentChannel = null;
+
+            lines.forEach((line) => {
+                line = line.trim();
+                if (line.startsWith('#EXTINF:')) {
+                    currentChannel = {
+                        id: Math.random().toString(36).substr(2, 9),
+                        name: 'Unknown Channel',
+                        group: 'Uncategorized',
+                        tvgId: '',
+                        logo: '',
+                        stream: '',
+                        enabled: true
+                    };
+
+                    const tvgIdMatch = line.match(/tvg-id="([^"]*)"/i);
+                    const logoMatch = line.match(/tvg-logo="([^"]*)"/i);
+                    const groupMatch = line.match(/group-title="([^"]*)"/i);
+
+                    if (tvgIdMatch) currentChannel.tvgId = tvgIdMatch[1];
+                    if (logoMatch) currentChannel.logo = logoMatch[1];
+                    if (groupMatch) currentChannel.group = groupMatch[1];
+
+                    const commaIdx = line.lastIndexOf(',');
+                    if (commaIdx !== -1) {
+                        currentChannel.name = line.substring(commaIdx + 1).trim();
+                    }
+                } else if (line && !line.startsWith('#') && currentChannel) {
+                    currentChannel.stream = line;
+                    parsedChannels.push(currentChannel);
+                    currentChannel = null;
+                }
+            });
+
+            return parsedChannels;
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Automatically set GitHub target filename to match uploaded file
+            const detectedName = formatSafeFilename(file.name);
+            document.getElementById('ghPath').value = detectedName;
+            state.github.path = detectedName;
+
+            showLoading(true, 'Parsing uploaded M3U file...');
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const channels = parseM3U(e.target.result);
+                if (channels.length > 0) {
+                    state.channels = channels;
+                    saveLocalStorage();
+                    updateDashboardStats();
+                    renderChannelsTable();
+                    updateGithubPreview();
+                    updateGithubPagesPreview();
+                    updateGom3uPreview();
+                    showToast(`Imported ${channels.length} channels! Auto-set filename to '${detectedName}'`, 'success');
+                } else {
+                    showToast('No valid channels found in the M3U file.', 'error');
+                }
+                showLoading(false);
+            };
+            reader.readAsText(file);
+        }
+
+        async function fetchM3uFromUrl() {
+            const url = document.getElementById('m3uUrlInput').value.trim();
+            if (!url) return showToast('Please enter a valid M3U URL', 'error');
+
+            showLoading(true, 'Fetching M3U playlist from URL...');
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const text = await response.text();
+                const channels = parseM3U(text);
+                
+                if (channels.length > 0) {
+                    state.channels = channels;
+                    saveLocalStorage();
+                    updateDashboardStats();
+                    renderChannelsTable();
+                    showToast(`Imported ${channels.length} channels from URL!`, 'success');
+                } else {
+                    showToast('Could not parse any channels from URL', 'error');
+                }
+            } catch (err) {
+                showToast('Failed to fetch M3U URL (CORS or network error)', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        /* ==================== DASHBOARD & STATS ==================== */
+        function updateDashboardStats() {
+            const total = state.channels.length;
+            const active = state.channels.filter(c => c.enabled).length;
+            const disabled = total - active;
+            const groups = new Set(state.channels.map(c => c.group || 'Uncategorized')).size;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-active').innerText = active;
+            document.getElementById('stat-disabled').innerText = disabled;
+            document.getElementById('stat-groups').innerText = groups;
+            document.getElementById('stat-playlists').innerText = state.playlists.length;
+
+            updateGroupFilterDropdown();
+        }
+
+        function renderPlaylistCards() {
+            const container = document.getElementById('playlistCardsGrid');
+            if (state.playlists.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-8 text-slate-500 text-sm">
+                        No saved playlists yet. Click "New Playlist" above to create one.
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = state.playlists.map(pl => `
+                <div class="bg-slate-900/60 border border-gray-800 rounded-xl p-4 flex flex-col justify-between hover:border-gray-700 transition">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-bold text-white text-md">${escapeHtml(pl.name)}</h4>
+                            <span class="text-xs bg-brand-500/10 text-brand-400 px-2 py-0.5 rounded font-medium">${pl.totalChannels} Channels</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-4">Last modified: ${pl.lastUpdate || 'N/A'}</p>
+                    </div>
+                    <div class="flex items-center gap-2 pt-2 border-t border-gray-800/60">
+                        <button onclick="copyGeneratedM3u()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-1.5 rounded text-xs font-medium transition flex items-center justify-center gap-1">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Content
+                        </button>
+                        <button onclick="deletePlaylist('${pl.id}')" class="p-1.5 text-rose-400 hover:bg-rose-500/10 rounded transition">
+                            <i data-lucide="trash" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function createNewPlaylistPrompt() {
+            const name = prompt('Enter a name for the new playlist preset:');
+            if (name) {
+                const newPl = {
+                    id: Math.random().toString(36).substr(2, 9),
+                    name: name,
+                    totalChannels: state.channels.length,
+                    lastUpdate: new Date().toLocaleDateString()
+                };
+                state.playlists.push(newPl);
+                saveLocalStorage();
+                updateDashboardStats();
+                renderPlaylistCards();
+                showToast('Playlist collection saved!', 'success');
+            }
+        }
+
+        function deletePlaylist(id) {
+            state.playlists = state.playlists.filter(p => p.id !== id);
+            saveLocalStorage();
+            updateDashboardStats();
+            renderPlaylistCards();
+            showToast('Playlist deleted', 'info');
+        }
+
+        /* ==================== CHANNEL EDITOR TABLE ==================== */
+        function updateGroupFilterDropdown() {
+            const select = document.getElementById('groupFilter');
+            const groups = Array.from(new Set(state.channels.map(c => c.group || 'Uncategorized'))).sort();
+            
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">All Groups</option>' + 
+                groups.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join('');
+            select.value = currentVal;
+        }
+
+        function renderChannelsTable() {
+            const tbody = document.getElementById('channelsTableBody');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const groupVal = document.getElementById('groupFilter').value;
+            const statusVal = document.getElementById('statusFilter').value;
+
+            const filtered = state.channels.filter((ch, index) => {
+                ch._originalIndex = index + 1;
+                const matchesSearch = ch.name.toLowerCase().includes(search) || 
+                                      ch.tvgId.toLowerCase().includes(search) ||
+                                      ch.group.toLowerCase().includes(search);
+                const matchesGroup = groupVal === '' || ch.group === groupVal;
+                const matchesStatus = statusVal === 'all' || 
+                                     (statusVal === 'active' && ch.enabled) || 
+                                     (statusVal === 'disabled' && !ch.enabled);
+                
+                return matchesSearch && matchesGroup && matchesStatus;
+            });
+
+            document.getElementById('visibleChannelsCount').innerText = filtered.length;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="py-8 text-center text-slate-500 font-sans">
+                            No channels found matching the criteria.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((ch) => {
+                const isSelected = state.selectedChannelIds.has(ch.id);
+                return `
+                <tr class="hover:bg-slate-800/40 transition ${!ch.enabled ? 'opacity-50' : ''}">
+                    <td class="py-2.5 px-4 text-center text-slate-500">${ch._originalIndex}</td>
+                    <td class="py-2.5 px-4 text-center">
+                        <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="toggleSelectChannel('${ch.id}', this.checked)" class="rounded bg-dark-bg border-gray-700 text-brand-600 focus:ring-0 w-4 h-4">
+                    </td>
+                    <td class="py-2.5 px-4">
+                        <img src="${escapeHtml(ch.logo)}" onerror="this.src='https://via.placeholder.com/32?text=TV'" class="w-7 h-7 object-contain rounded bg-slate-900 border border-gray-800">
+                    </td>
+                    <td class="py-2.5 px-4 font-semibold text-slate-200">${escapeHtml(ch.name)}</td>
+                    <td class="py-2.5 px-4"><span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">${escapeHtml(ch.group || 'N/A')}</span></td>
+                    <td class="py-2.5 px-4 text-slate-400">${escapeHtml(ch.tvgId || '-')}</td>
+                    <td class="py-2.5 px-4 text-slate-400 max-w-[200px] truncate" title="${escapeHtml(ch.stream)}">${escapeHtml(ch.stream)}</td>
+                    <td class="py-2.5 px-4 text-center">
+                        <button onclick="toggleChannelStatus('${ch.id}')" class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${ch.enabled ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
+                            ${ch.enabled ? 'ACTIVE' : 'DISABLED'}
+                        </button>
+                    </td>
+                    <td class="py-2.5 px-4 text-right space-x-1">
+                        <button onclick="openEditChannelModal('${ch.id}')" class="p-1 text-slate-400 hover:text-brand-400 transition"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                        <button onclick="duplicateChannel('${ch.id}')" class="p-1 text-slate-400 hover:text-amber-400 transition"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                        <button onclick="deleteChannel('${ch.id}')" class="p-1 text-slate-400 hover:text-rose-400 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </td>
+                </tr>
+            `}).join('');
+
+            lucide.createIcons();
+            updateSelectedCountText();
+        }
+
+        function applyFilters() {
+            renderChannelsTable();
+        }
+
+        function toggleChannelStatus(id) {
+            const ch = state.channels.find(c => c.id === id);
+            if (ch) {
+                ch.enabled = !ch.enabled;
+                saveLocalStorage();
+                renderChannelsTable();
+                updateDashboardStats();
+            }
+        }
+
+        function duplicateChannel(id) {
+            const ch = state.channels.find(c => c.id === id);
+            if (ch) {
+                const copy = { ...ch, id: Math.random().toString(36).substr(2, 9), name: `${ch.name} (Copy)` };
+                state.channels.push(copy);
+                saveLocalStorage();
+                renderChannelsTable();
+                updateDashboardStats();
+                showToast('Channel duplicated', 'success');
+            }
+        }
+
+        function deleteChannel(id) {
+            state.channels = state.channels.filter(c => c.id !== id);
+            state.selectedChannelIds.delete(id);
+            saveLocalStorage();
+            renderChannelsTable();
+            updateDashboardStats();
+            showToast('Channel deleted', 'info');
+        }
+
+        function toggleSelectAll(checked) {
+            if (checked) {
+                state.channels.forEach(c => state.selectedChannelIds.add(c.id));
+            } else {
+                state.selectedChannelIds.clear();
+            }
+            renderChannelsTable();
+        }
+
+        function toggleSelectChannel(id, checked) {
+            if (checked) state.selectedChannelIds.add(id);
+            else state.selectedChannelIds.delete(id);
+            updateSelectedCountText();
+        }
+
+        function updateSelectedCountText() {
+            document.getElementById('selectedCountText').innerText = `(${state.selectedChannelIds.size} selected)`;
+        }
+
+        function bulkDelete() {
+            if (state.selectedChannelIds.size === 0) return showToast('No channels selected', 'error');
+            if (confirm(`Delete ${state.selectedChannelIds.size} selected channels?`)) {
+                state.channels = state.channels.filter(c => !state.selectedChannelIds.has(c.id));
+                state.selectedChannelIds.clear();
+                saveLocalStorage();
+                renderChannelsTable();
+                updateDashboardStats();
+                showToast('Selected channels removed', 'success');
+            }
+        }
+
+        function bulkChangeGroup() {
+            if (state.selectedChannelIds.size === 0) return showToast('No channels selected', 'error');
+            const newGroup = prompt('Enter new Group Title for selected channels:');
+            if (newGroup !== null) {
+                state.channels.forEach(c => {
+                    if (state.selectedChannelIds.has(c.id)) c.group = newGroup;
+                });
+                saveLocalStorage();
+                renderChannelsTable();
+                updateDashboardStats();
+                showToast('Group updated for selection', 'success');
+            }
+        }
+
+        function bulkReplaceLogo() {
+            if (state.selectedChannelIds.size === 0) return showToast('No channels selected', 'error');
+            const newLogo = prompt('Enter new Logo URL for selected channels:');
+            if (newLogo !== null) {
+                state.channels.forEach(c => {
+                    if (state.selectedChannelIds.has(c.id)) c.logo = newLogo;
+                });
+                saveLocalStorage();
+                renderChannelsTable();
+                showToast('Logo updated for selection', 'success');
+            }
+        }
+
+        function openEditChannelModal(id) {
+            const ch = state.channels.find(c => c.id === id);
+            if (!ch) return;
+
+            document.getElementById('editChannelId').value = ch.id;
+            document.getElementById('modalChannelName').value = ch.name;
+            document.getElementById('modalChannelGroup').value = ch.group;
+            document.getElementById('modalChannelTvgId').value = ch.tvgId;
+            document.getElementById('modalChannelLogo').value = ch.logo;
+            document.getElementById('modalChannelStream').value = ch.stream;
+            document.getElementById('modalChannelEnabled').checked = ch.enabled;
+
+            document.getElementById('channelModalTitle').innerText = 'Edit Channel';
+            openModal('channelModal');
+        }
+
+        function handleSaveChannel(e) {
+            e.preventDefault();
+            const id = document.getElementById('editChannelId').value;
+            const channelData = {
+                id: id || Math.random().toString(36).substr(2, 9),
+                name: document.getElementById('modalChannelName').value,
+                group: document.getElementById('modalChannelGroup').value,
+                tvgId: document.getElementById('modalChannelTvgId').value,
+                logo: document.getElementById('modalChannelLogo').value,
+                stream: document.getElementById('modalChannelStream').value,
+                enabled: document.getElementById('modalChannelEnabled').checked
+            };
+
+            if (id) {
+                const idx = state.channels.findIndex(c => c.id === id);
+                if (idx !== -1) state.channels[idx] = channelData;
+            } else {
+                state.channels.push(channelData);
+            }
+
+            saveLocalStorage();
+            renderChannelsTable();
+            updateDashboardStats();
+            closeModal('channelModal');
+            showToast('Channel saved successfully', 'success');
+        }
+
+        /* ==================== PLAYLIST GENERATOR ==================== */
+        function generateM3uString() {
+            let output = '#EXTM3U\n';
+            state.channels.filter(c => c.enabled).forEach(ch => {
+                output += `#EXTINF:-1 tvg-id="${ch.tvgId || ''}" tvg-logo="${ch.logo || ''}" group-title="${ch.group || ''}",${ch.name}\n`;
+                output += `${ch.stream}\n`;
+            });
+            return output;
+        }
+
+        function generateM3uOutput() {
+            document.getElementById('m3uOutputTextarea').value = generateM3uString();
+        }
+
+        function copyGeneratedM3u() {
+            const content = generateM3uString();
+            navigator.clipboard.writeText(content).then(() => {
+                showToast('M3U content copied to clipboard!', 'success');
+            });
+        }
+
+        function downloadM3uFile() {
+            const content = generateM3uString();
+            const safeFileName = formatSafeFilename(state.github.path || 'bd.m3u');
+            const blob = new Blob([content], { type: 'audio/x-mpegurl' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = safeFileName;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast(`Downloaded ${safeFileName}`, 'success');
+        }
+
+        /* ==================== GITHUB SYNC & AUTOMATIC URL GENERATOR ==================== */
+        function populateGithubFields() {
+            document.getElementById('ghUsername').value = state.github.username || 'GoM3U';
+            document.getElementById('ghRepo').value = state.github.repo || 'GoM3U-URL';
+            document.getElementById('ghBranch').value = state.github.branch || 'main';
+            document.getElementById('ghPath').value = state.github.path || 'bd.m3u';
+            document.getElementById('ghToken').value = state.github.token || '';
+
+            updateGithubPreview();
+        }
+
+        function readGithubInputs() {
+            state.github.username = document.getElementById('ghUsername').value.trim() || 'GoM3U';
+            state.github.repo = document.getElementById('ghRepo').value.trim() || 'GoM3U-URL';
+            state.github.branch = document.getElementById('ghBranch').value.trim() || 'main';
+            state.github.path = formatSafeFilename(document.getElementById('ghPath').value);
+            state.github.token = document.getElementById('ghToken').value.trim();
+            saveLocalStorage();
+        }
+
+        function updateGithubPreview() {
+            readGithubInputs();
+            const { username, repo, branch, path } = state.github;
+            const generatedUrl = buildGitHubRawUrl(username, repo, branch, path);
+            
+            const rawPreviewEl = document.getElementById('rawGistPreview');
+            if (rawPreviewEl) rawPreviewEl.innerText = generatedUrl;
+            
+            document.getElementById('dash-repo-name').innerText = (username && repo) ? `${username}/${repo}` : 'GoM3U/GoM3U-URL';
+            document.getElementById('dash-file-path').innerText = path;
+        }
+
+        async function testGitHubConnection() {
+            readGithubInputs();
+            const { username, repo, token } = state.github;
+
+            if (!username || !repo) return showToast('Please enter Username and Repository', 'error');
+
+            showLoading(true, 'Testing GitHub repository access...');
+            try {
+                const headers = {};
+                if (token) headers['Authorization'] = `token ${token}`;
+
+                const res = await fetch(`https://api.github.com/repos/${username}/${repo}`, { headers });
+                if (res.ok) {
+                    showToast('GitHub repository connection successful!', 'success');
+                } else {
+                    showToast(`GitHub Error: ${res.statusText}`, 'error');
+                }
+            } catch (e) {
+                showToast('Failed connection test to GitHub API', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function syncToGitHub() {
+            readGithubInputs();
+            const { username, repo, branch, path, token } = state.github;
+            const commitMsg = document.getElementById('ghCommitMsg').value;
+
+            if (!username || !repo || !token) {
+                return showToast('GitHub Token, Username, and Repo are required to Sync', 'error');
+            }
+
+            // Automatically detect target playlist filename
+            const targetFilePath = formatSafeFilename(path);
+            const rawUrl = buildGitHubRawUrl(username, repo, branch, targetFilePath);
+
+            showLoading(true, `Pushing '${targetFilePath}' to GitHub...`);
+
+            try {
+                const contentBase64 = btoa(unescape(encodeURIComponent(generateM3uString())));
+                const fileUrl = `https://api.github.com/repos/${username}/${repo}/contents/${targetFilePath}`;
+                
+                // Check if file already exists to obtain SHA
+                let sha = null;
+                const getRes = await fetch(fileUrl + `?ref=${branch}`, {
+                    headers: { 'Authorization': `token ${token}` }
+                });
+                if (getRes.ok) {
+                    const data = await getRes.json();
+                    sha = data.sha;
+                }
+
+                // Create or Update File in Repository
+                const putRes = await fetch(fileUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: commitMsg,
+                        content: contentBase64,
+                        branch: branch,
+                        ...(sha && { sha })
+                    })
+                });
+
+                if (putRes.ok) {
+                    const now = new Date();
+                    const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const dateString = now.toLocaleDateString();
+
+                    state.github.lastSync = `${dateString} ${timeString}`;
+
+                    // Backup Raw History Entry
+                    const historyEntry = {
+                        id: Math.random().toString(36).substr(2, 9),
+                        playlistName: `${repo} (${targetFilePath})`,
+                        fileName: targetFilePath,
+                        url: rawUrl,
+                        createdAt: `${dateString} ${timeString}`
+                    };
+                    state.urlHistory = state.urlHistory.filter(item => item.url !== rawUrl);
+                    state.urlHistory.unshift(historyEntry);
+
+                    // --- AUTOMATIC GOM3U CUSTOM DOMAIN URL GENERATOR ---
+                    const customDomainBase = (document.getElementById('gom3uCustomDomainInput') ? document.getElementById('gom3uCustomDomainInput').value.trim() : 'https://gom3u.site.je') || 'https://gom3u.site.je';
+                    const customLiveUrl = buildGom3uCustomUrl(targetFilePath, customDomainBase);
+
+                    const gom3uEntry = {
+                        id: Math.random().toString(36).substr(2, 9),
+                        playlistName: targetFilePath.replace(/\.[^/.]+$/, "").toUpperCase() + " Playlist",
+                        fileName: targetFilePath,
+                        repo: repo || 'GoM3U-URL',
+                        customDomain: customDomainBase,
+                        url: customLiveUrl,
+                        createdAt: `${dateString} ${timeString}`,
+                        status: 'Success'
+                    };
+
+                    if (!state.gom3uUrlHistory) state.gom3uUrlHistory = [];
+                    state.gom3uUrlHistory = state.gom3uUrlHistory.filter(item => item.url !== customLiveUrl);
+                    state.gom3uUrlHistory.unshift(gom3uEntry);
+
+                    renderGom3uUrlHistory();
+                    // --- END GOM3U CUSTOM DOMAIN GENERATION ---
+
+                    saveLocalStorage();
+
+                    document.getElementById('dash-last-sync').innerText = timeString;
+                    document.getElementById('stat-sync-badge').innerText = 'Synced';
+                    document.getElementById('stat-sync-badge').className = 'px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+
+                    renderUrlHistory();
+                    showToast(`Successfully synced '${targetFilePath}' & generated GoM3U URL!`, 'success');
+                } else {
+                    const errData = await putRes.json();
+                    showToast(`Commit Failed: ${errData.message}`, 'error');
+                }
+
+            } catch (e) {
+                showToast('Error executing GitHub Sync API call', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        /* ==================== GOM3U CUSTOM DOMAIN AUTOMATIC LOGIC ==================== */
+        function updateGom3uPreview() {
+            readGithubInputs();
+            const customBase = (document.getElementById('gom3uCustomDomainInput').value || 'https://gom3u.site.je').trim();
+            const { path } = state.github;
+            
+            state.github.pagesCustomBase = customBase;
+            saveLocalStorage();
+
+            const generatedUrl = buildGom3uCustomUrl(path, customBase);
+            document.getElementById('gom3uCustomUrlPreview').innerText = generatedUrl;
+        }
+
+        function copyGom3uLinkPreview() {
+            const text = document.getElementById('gom3uCustomUrlPreview').innerText;
+            copyToClipboard(text, 'GoM3U Custom Domain URL copied to clipboard!');
+        }
+
+        function openGom3uLinkPreview() {
+            const text = document.getElementById('gom3uCustomUrlPreview').innerText;
+            window.open(text, '_blank');
+        }
+
+        function renderGom3uUrlHistory() {
+            const container = document.getElementById('gom3uCustomUrlHistoryGrid');
+            if (!container) return;
+
+            if (!state.gom3uUrlHistory || state.gom3uUrlHistory.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-8 text-slate-500 text-xs">
+                        No live GoM3U custom domain URLs generated yet. Sync your playlist with GitHub to generate URLs automatically.
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = state.gom3uUrlHistory.map(item => `
+                <div class="bg-slate-900/80 border border-emerald-500/30 rounded-xl p-4 flex flex-col justify-between hover:border-emerald-400 transition shadow-lg relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-16 h-16 pointer-events-none overflow-hidden">
+                        <div class="bg-emerald-500 text-[9px] font-bold text-black py-0.5 text-center transform rotate-45 translate-x-4 translate-y-2 uppercase shadow">Live</div>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-2 pr-6">
+                            <h4 class="font-bold text-white text-sm truncate" title="${escapeHtml(item.playlistName)}">${escapeHtml(item.playlistName)}</h4>
+                            <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded font-mono">${escapeHtml(item.fileName)}</span>
+                        </div>
+                        
+                        <div class="space-y-1 my-2 text-[11px] text-slate-400 border-y border-gray-800/80 py-2">
+                            <div class="flex justify-between">
+                                <span>Repository:</span>
+                                <span class="font-mono text-slate-200">${escapeHtml(item.repo || 'GoM3U-URL')}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Custom Domain:</span>
+                                <span class="font-mono text-slate-200">${escapeHtml(item.customDomain || 'https://gom3u.site.je')}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Sync Status:</span>
+                                <span class="text-emerald-400 font-semibold flex items-center gap-1">
+                                    <i data-lucide="check-circle-2" class="w-3 h-3"></i> Success
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="bg-dark-bg border border-gray-800 rounded-lg p-2 font-mono text-[11px] text-emerald-400 break-all mb-3 select-all">
+                            ${escapeHtml(item.url)}
+                        </div>
+                        
+                        <p class="text-[10px] text-slate-500 mb-3">Created: ${item.createdAt}</p>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 pt-2 border-t border-gray-800/60">
+                        <button onclick="copyToClipboard('${escapeHtml(item.url)}', 'Live Custom Domain Playlist URL copied!')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy URL
+                        </button>
+
+                        <button onclick="showQrCodeModal('${escapeHtml(item.url)}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-gray-700 transition" title="Show QR Code">
+                            <i data-lucide="qr-code" class="w-4 h-4"></i>
+                        </button>
+
+                        <a href="${escapeHtml(item.url)}" target="_blank" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-gray-700 transition flex items-center justify-center" title="Open Live URL">
+                            <i data-lucide="external-link" class="w-4 h-4"></i>
+                        </a>
+
+                        <button onclick="deleteGom3uUrlHistory('${item.id}')" class="p-1.5 text-rose-400 hover:bg-rose-500/10 rounded-lg transition" title="Remove Card">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function deleteGom3uUrlHistory(id) {
+            state.gom3uUrlHistory = state.gom3uUrlHistory.filter(u => u.id !== id);
+            saveLocalStorage();
+            renderGom3uUrlHistory();
+            showToast('Custom Domain URL removed', 'info');
+        }
+
+        function clearGom3uUrlHistory() {
+            if (confirm('Clear all saved GoM3U custom domain URL history?')) {
+                state.gom3uUrlHistory = [];
+                saveLocalStorage();
+                renderGom3uUrlHistory();
+                showToast('Custom domain URL history cleared', 'info');
+            }
+        }
+
+        /* ==================== GITHUB PLAYLIST URL HISTORY CARDS (Legacy) ==================== */
+        function renderUrlHistory() {
+            const container = document.getElementById('githubUrlHistoryGrid');
+            if (!container) return;
+            if (!state.urlHistory || state.urlHistory.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-6 text-slate-500 text-xs">
+                        No raw history entries recorded yet.
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = state.urlHistory.map(item => `
+                <div class="bg-slate-900/60 border border-gray-800 rounded-xl p-4 flex flex-col justify-between hover:border-brand-500/40 transition">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-bold text-white text-sm truncate" title="${escapeHtml(item.playlistName)}">${escapeHtml(item.playlistName)}</h4>
+                            <span class="text-[10px] bg-slate-800 text-slate-300 border border-gray-700 px-2 py-0.5 rounded font-mono">${escapeHtml(item.fileName)}</span>
+                        </div>
+                        
+                        <div class="bg-dark-bg border border-gray-800 rounded-lg p-2 font-mono text-[11px] text-brand-400 break-all mb-3 select-all">
+                            ${escapeHtml(item.url)}
+                        </div>
+                        
+                        <p class="text-[10px] text-slate-500 mb-3">Created: ${item.createdAt}</p>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 pt-2 border-t border-gray-800/60">
+                        <button onclick="copyToClipboard('${escapeHtml(item.url)}', 'Raw URL copied!')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 py-1.5 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1 border border-gray-700">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Raw
+                        </button>
+
+                        <button onclick="deleteUrlHistory('${item.id}')" class="p-1.5 text-rose-400 hover:bg-rose-500/10 rounded-lg transition" title="Remove URL">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function deleteUrlHistory(id) {
+            state.urlHistory = state.urlHistory.filter(u => u.id !== id);
+            saveLocalStorage();
+            renderUrlHistory();
+            showToast('URL removed from history', 'info');
+        }
+
+        function clearUrlHistory() {
+            if (confirm('Clear all saved GitHub playlist URL history?')) {
+                state.urlHistory = [];
+                saveLocalStorage();
+                renderUrlHistory();
+                showToast('URL history cleared', 'info');
+            }
+        }
+
+        /* ==================== GITHUB PAGES EXTENSION LOGIC ==================== */
+        function populateGithubPagesFields() {
+            const input = document.getElementById('gom3uCustomDomainInput');
+            if (input) input.value = (state.github && state.github.pagesCustomBase) ? state.github.pagesCustomBase : 'https://gom3u.site.je';
+            updateGom3uPreview();
+        }
+
+        function updateGithubPagesPreview() {
+            updateGom3uPreview();
+        }
+
+        function renderPagesUrlHistory() {}
+
+        /* ==================== QR CODE MODAL GENERATOR ==================== */
+        function showQrCodeModal(url) {
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
+
+            new QRCode(qrContainer, {
+                text: url,
+                width: 180,
+                height: 180,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            document.getElementById('qrUrlText').innerText = url;
+            openModal('qrModal');
+        }
+
+        /* ==================== BACKUP & RESTORE ==================== */
+        function exportBackupJson() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `m3u_studio_backup_${new Date().toISOString().slice(0,10)}.json`);
+            dlAnchor.click();
+            showToast('Backup JSON exported successfully', 'success');
+        }
+
+        function importBackupJson(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed.channels) {
+                        state = { ...state, ...parsed };
+                        saveLocalStorage();
+                        updateDashboardStats();
+                        renderChannelsTable();
+                        renderPlaylistCards();
+                        populateGithubFields();
+                        populateGithubPagesFields();
+                        renderUrlHistory();
+                        renderPagesUrlHistory();
+                        renderGom3uUrlHistory();
+                        closeModal('backupModal');
+                        showToast('Backup data restored successfully!', 'success');
+                    } else {
+                        showToast('Invalid backup file structure', 'error');
+                    }
+                } catch (err) {
+                    showToast('Failed to parse JSON backup file', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        /* ==================== UI HELPERS & UTILITIES ==================== */
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            if (id === 'channelModal') {
+                document.getElementById('channelForm').reset();
+                document.getElementById('editChannelId').value = '';
+            }
+        }
+
+        function showLoading(show, text = 'Processing...') {
+            const overlay = document.getElementById('loadingOverlay');
+            document.getElementById('loadingText').innerText = text;
+            if (show) overlay.classList.remove('hidden');
+            else overlay.classList.add('hidden');
+        }
+
+        function copyToClipboard(text, successMsg = 'Copied to clipboard!') {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(successMsg, 'success');
+            });
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const bgColors = {
+                success: 'bg-emerald-600 text-white',
+                error: 'bg-rose-600 text-white',
+                info: 'bg-slate-800 text-slate-100 border border-gray-700'
+            };
+
+            toast.className = `px-4 py-3 rounded-xl shadow-2xl text-xs font-medium flex items-center gap-2 transform transition-all duration-300 translate-y-2 ${bgColors[type] || bgColors.info}`;
+            toast.innerHTML = `<span>${escapeHtml(message)}</span>`;
+            
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>"']/g, function(m) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                }[m];
+            });
+        }
+    </script>
+</body>
+</html>
