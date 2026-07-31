@@ -17,13 +17,13 @@ https://********.***
 https://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://dl.dropbox.com/s/k7z1dsec1jfjbkn/jamuna_tv_bd.png" group-title="BANGLA",JAMUNA TV
 https://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://bugsfreeweb.github.io/LiveTVCollector/BugsfreeLogo/default-logo.png" group-title="BANGLA",Star News
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="BANGLA",Star News
 https://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://dl.dropbox.com/s/bl983avhouqd47c/news_24_bd.png" group-title="BANGLA",NEWS 24 HD
 https://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/9/9f/DBC_News_logo.png" group-title="BANGLA",DBC News
 https://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://upload.wikimedia.org/wikipedia/en/0/0d/Ekhon_Logo.png" group-title="BANGLA",Ekhon tv
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="BANGLA",Ekhon tv
 https://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://dl.dropbox.com/s/4ldi1dp09s8o6bm/atn_news_bd.png" group-title="BANGLA",ATN NEWS [BD]
 https://********.***
@@ -39,11 +39,11 @@ https://********.***
 https://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://s4.gifyu.com/images/image534fa27d7683f33d.png" group-title="BANGLA",Ekushey TV
 http://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://cdn.tvpassport.com/image/station/240x135/channel-i-bangla.png" group-title="BANGLA",Channel I
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="BANGLA",Channel I
 https://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://upload.wikimedia.org/wikipedia/en/3/31/Deepto_TV_logo.png" group-title="BANGLA",Deepto TV
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="BANGLA",Deepto TV
 https://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://upload.wikimedia.org/wikipedia/en/thumb/3/39/Maasranga_Television_Logo.jpg/180px-Maasranga_Television_Logo.jpg" group-title="BANGLA",Maasranga Tv
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="BANGLA",Maasranga Tv
 https://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://i.ibb.co/xgfM1sf/2021-06-14-fff22-19-07.jpg" group-title="BANGLA",Channel 9
 https://********.***
@@ -55,19 +55,19 @@ http://********.***
 https://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://dl.dropbox.com/s/jjr5835pbth49tm/my_tv_bd.png" group-title="BANGLA",MY TV HD
 https://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://upload.wikimedia.org/wikipedia/en/thumb/9/94/Mohona_tv_Logo.svg/1200px-Mohona_tv_Logo.svg.png" group-title="BANGLA",Mohona Tv
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="BANGLA",Mohona Tv
 https://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://i.ibb.co/0rPdpW9/MB-TV.jpg" group-title="BANGLA",Movie Bangla TV
 http://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://bugsfreeweb.github.io/LiveTVCollector/BugsfreeLogo/default-logo.png" group-title="BANGLA",Channel S
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="BANGLA",Channel S
 https://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://1000logos.net/wp-content/uploads/2020/08/Al-Jazeera-Logo.jpg" group-title="English News",Al Jazeera
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="English News",Al Jazeera
 https://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://logos-world.net/wp-content/uploads/2020/11/CNN-Logo.png" group-title="English News",CNN
 https://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://raw.githubusercontent.com/subirkumarpaul/Logo/main/BBC%20World%20News.png" group-title="English News",BBC World
 http://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://bugsfreeweb.github.io/LiveTVCollector/BugsfreeLogo/default-logo.png" group-title="English News",Sky News
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="English News",Sky News
 https://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://images-na.ssl-images-amazon.com/images/I/71CywdrFaZL.png" group-title="Islamic",Peace tv Bangla
 https://********.***
@@ -77,23 +77,23 @@ https://********.***
 https://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://bdiptv.stream/uploads/tv_image/discovery.png" group-title="Documentary",Discovery Hindi
 http://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://bdiptv.stream/uploads/tv_image/discovery.png" group-title="Documentary",Discovery Hindi
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="Documentary",Discovery Hindi
 https://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://i.postimg.cc/sfZsrWst/20240823_023726.png" group-title="Documentary",Wild Earth
 https://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://upload.wikimedia.org/wikipedia/en/4/44/BBC_Earth_logo.png" group-title="Documentary",BBC Earth
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="Documentary",BBC Earth
 https://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://bugsfreeweb.github.io/LiveTVCollector/BugsfreeLogo/default-logo.png" group-title="Documentary",REAL WILD
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="Documentary",REAL WILD
 https://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://logos-world.net/wp-content/uploads/2020/09/National-Geographic-Logo.png" group-title="Documentary",NAT GEO HD
 http://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Sony_Aath_logo.svg/1200px-Sony_Aath_logo.svg.png" group-title="Indian-Bangla",Sony Aath
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="Indian-Bangla",Sony Aath
 https://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://yt3.ggpht.com/ytc/AKedOLStHh2dnAyRzexuxwISlK8CPWNQb09Xr4tpYGBM=s900-c-k-c0x00ffffff-no-rj" group-title="Indian-Bangla",Akash Aath
 https://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8wJdNPAfkGDb7D52d7HRbJ5hLgCUB7Ss74mStkPgemQ&s" group-title="Indian-Bangla",DD Bangla
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="Indian-Bangla",DD Bangla
 https://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://upload.wikimedia.org/wikipedia/en/thumb/e/ea/Enterr10_Bangla.jpeg/200px-Enterr10_Bangla.jpeg" group-title="Indian-Bangla",Enter 10 Bangla
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="Indian-Bangla",Enter 10 Bangla
 https://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/1/13/Colors-cineplex.png?20211203010524" group-title="Hindi",Colors Cineplex HD
 https://********.***
@@ -157,9 +157,9 @@ http://********.***
 http://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://static.epg.best/qa/beINSports1.qa.png" group-title="SPORTS",BeIN Sports Extra
 https://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://bugsfreeweb.github.io/LiveTVCollector/BugsfreeLogo/default-logo.png" group-title="SPORTS",Cowboy tv
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="SPORTS",Cowboy tv
 https://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://bugsfreeweb.github.io/LiveTVCollector/BugsfreeLogo/default-logo.png" group-title="SPORTS",MTR Sports-1
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="SPORTS",MTR Sports-1
 https://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://lo1.in/LOGO/CARIBBEAN/FLOWSPORTS2.png" group-title="SPORTS",RTA SPORTS
 https://********.***
@@ -179,9 +179,9 @@ http://********.***
 http://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://raw.githubusercontent.com/subirkumarpaul/Logo/main/T%20Sports.png" group-title="Bangla",T Sports
 http://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://bugsfreeweb.github.io/LiveTVCollector/BugsfreeLogo/default-logo.png" group-title="Hindi Movies",Zee Action
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="Hindi Movies",Zee Action
 http://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://bugsfreeweb.github.io/LiveTVCollector/BugsfreeLogo/default-logo.png" group-title="Hindi Movies",B4U Kadak
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="Hindi Movies",B4U Kadak
 https://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://raw.githubusercontent.com/subirkumarpaul/Logo/main/Colors%20Cineplax.png" group-title="Hindi Movies",Colors Cineplex
 http://********.***
@@ -189,7 +189,7 @@ http://********.***
 http://********.***
 #EXTINF:-1 tvg-id="" tvg-logo="https://raw.githubusercontent.com/subirkumarpaul/Logo/main/And%20Pictures%20.png" group-title="Hindi Movies",And Pictures
 http://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://bugsfreeweb.github.io/LiveTVCollector/BugsfreeLogo/default-logo.png" group-title="Hindi Movies",Hinde Movies 2
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="Hindi Movies",Hinde Movies 2
 https://********.***
-#EXTINF:-1 tvg-id="" tvg-logo="https://bugsfreeweb.github.io/LiveTVCollector/BugsfreeLogo/default-logo.png" group-title="GOLDMINES",Goldminnes Action
+#EXTINF:-1 tvg-id="" tvg-logo="https://gom3u.github.io/GoM3U-Logo/" group-title="GOLDMINES",Goldminnes Action
 http://********.***
